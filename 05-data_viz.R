@@ -135,3 +135,77 @@ spotify_data %>%
   summarize(mean_popularity = mean(track_popularity)) %>% 
   arrange(-mean_popularity)
 
+############### OCTOBER 06 ###################
+# what artists are represented in the data set
+spotify_data %>%
+  select(track_artist) %>%
+  unique() %>%
+  View()
+
+# count number of songs per artist, and arrange results
+# showing artist with most songs first
+spotify_data %>%
+  count(track_artist) %>%
+  arrange(-n) 
+
+# filter data to only keep the following artists:
+# The Cranberries, The Beatles, and Queen
+artist_to_keep <- c("The Cranberries",
+                    "The Beatles",
+                    "Queen",
+                    "Drake")
+
+# create a new data frame with selected artists  
+filtered_data <- spotify_data %>%
+  filter(track_artist %in% artist_to_keep)
+
+# inspect data frame to check whether it is 
+# what you wanted it to be
+filtered_data %>%
+  count(track_artist)
+
+# what genres these artists represent
+filtered_data %>%
+  count(track_artist, playlist_genre)
+
+spotify_data %>%
+  filter(track_artist %in% artist_to_keep) %>%
+  count(track_artist, playlist_genre)
+
+# what are the two pop songs by Queen
+filtered_data %>%
+  filter(track_artist == "Queen" & 
+           playlist_genre == "pop") %>%
+  select(track_name)
+
+
+# summarize mean track_popularity by track_artist and decade
+filtered_data %>%
+  group_by(track_artist, decade) %>%
+  summarise(mean_pop = mean(track_popularity))
+
+# plot your summarized results 
+# decade (x) by mean popularity (y) across track_artist (color)
+# try geom_point() + geom_line()
+# geom_line needs another aesthetics, group
+filtered_data %>%
+  group_by(track_artist, decade) %>%
+  summarise(mean_pop = mean(track_popularity)) %>%
+  ggplot(aes(x = decade,
+             y = mean_pop,
+             color = track_artist)) +
+  geom_point() +
+  geom_line()
+
+# use geom_col() you might need to change position to "dodge"
+filtered_data %>%
+  group_by(track_artist, decade) %>%
+  summarise(mean_pop = mean(track_popularity)) %>%
+  ggplot(aes(x = decade,
+             y = mean_pop,
+             fill = track_artist)) +
+  geom_col(position = "dodge")
+
+
+
+
