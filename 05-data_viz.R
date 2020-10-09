@@ -206,6 +206,67 @@ filtered_data %>%
              fill = track_artist)) +
   geom_col(position = "dodge")
 
+############ OCTOBER 08 #####################
+# 1. Filter data (DONE), resulting df is filtered_data
+# 2. group_by() and summarize()
+# 3. plot
+filtered_data %>%
+  group_by(track_artist, decade) %>%
+  summarise(mean_popularity = mean(track_popularity)) %>%
+  ggplot(aes(x = decade,
+             y = mean_popularity,
+             fill = track_artist)) +
+  geom_col() +
+  facet_wrap(~track_artist)
+
+# 1. filtered_data
+# 2. group_by and summarise()
+# summarise() should hold both mean() and sd()
+filtered_data %>%
+  group_by(track_artist, decade) %>%
+  summarise(total = n(),
+            mean_popularity = mean(track_popularity),
+            sd_popularity = sd(track_popularity)) %>%
+  mutate(lower = mean_popularity - sd_popularity,
+         upper = mean_popularity + sd_popularity) %>%
+  ggplot(aes(x = decade,
+             y = mean_popularity,
+             fill = track_artist)) +
+  geom_col() +
+  facet_wrap(~track_artist) +
+  geom_errorbar(aes(ymin = lower, ymax = upper))
+
+# from the plot above, remove decade from it
+# map track_artist to the x axis
+filtered_data %>%
+  group_by(track_artist) %>%
+  summarise(mean_popularity = mean(track_popularity),
+            sd_popularity = sd(track_popularity)) %>%
+  mutate(lower = mean_popularity - sd_popularity,
+         upper = mean_popularity + sd_popularity) %>%
+  ggplot(aes(x = track_artist,
+             y = mean_popularity,
+             fill = track_artist)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = lower, ymax = upper))  +
+  xlab("") +
+  ylab("mean popularity") +
+  theme_bw() +
+  theme(legend.position = "none") +
+  ggtitle("Average Popularity of Songs across Artists")
+
+# start with the original data (spotify_data)
+# filter for track_artist "Drake"
+# group_by track_album_name
+# summarise mean popularity
+spotify_data %>%
+  filter(track_artist == "Drake") %>%
+  group_by(track_album_name) %>%
+  summarise(mean_popularity = mean(track_popularity)) %>%
+  ggplot(aes(y = reorder(track_album_name, mean_popularity),
+             x = mean_popularity)) +
+  geom_col()
+
 
 
 
