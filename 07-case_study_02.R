@@ -1,4 +1,5 @@
 # load libraries
+# install.packages("lubridate")
 library(lubridate)
 library(janitor)
 library(tidyverse)
@@ -77,5 +78,47 @@ global_temp_cont %>%
   geom_point() +
   geom_line()
 
+############### OCTOBER 27 ##############
+global_temp_cont %>%
+  distinct(country)
 
+global_temp_cont %>%
+  distinct(continent)
 
+# numeric way of getting decade from year
+# 1986 to 1980
+1986 - (1986 %% 10)
+(1986 %/% 10) * 10
+
+# mutate global_temp_cont to add decade based on year
+global_temp_cont <- global_temp_cont %>%
+  mutate(decade = (year %/% 10) * 10)
+
+# check decade year with count()
+global_temp_cont %>%
+  count(year, decade)
+
+# start with global_temp_cont and then
+# summarise mean of average_temperature per continent and decade
+# plot
+global_temp_cont %>%
+  group_by(continent, decade) %>%
+  summarise(mean_temp = mean(average_temperature, na.rm = TRUE)) %>%
+  ggplot(aes(x = decade,
+             y = mean_temp,
+             color = continent)) +
+  geom_point() +
+  geom_line()
+
+# filter the data to keep continent == "Europe"
+# summarise mean of average_temperature per decade
+# plot
+global_temp_cont %>%
+  filter(continent == "Europe") %>%
+  group_by(decade) %>%
+  summarise(mean_temp = mean(average_temperature, na.rm = TRUE)) %>%
+  ggplot(aes(x = decade, y = mean_temp)) +
+  geom_point() +
+  geom_line() +
+  labs(y = "mean temperature in Celsius") +
+  ylim(0, 30)
