@@ -1,0 +1,94 @@
+---
+title: "Beer Awards Analysis"
+author: "Adriana Picoral"
+date: "November 10, 2020"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Text Formatting
+
+## Examples of Text Formatting
+
+You can format words in *italics* or **bold**. 
+
+- first item of a list
+- second item of a list
+
+1. first item in numbered list
+1. second item in numbered list
+1. third item in numbered list
+
+> This is quote
+
+# Beer Awards Analysis
+
+Here's what my data like (displaying first six rows).
+
+```{r message=FALSE, echo=FALSE}
+# load library
+library(tidyverse)
+
+# read data in
+beer_awards <- read_csv("data/clean_beer_awards.csv")
+
+# print head
+head(beer_awards) %>%
+  knitr::kable()
+```
+
+My data questions are as follows:
+
+1. Which region in the US has received the most beer awards?
+1. Which beer type has won the awards across different regions in the US?
+
+## Awards per Region
+
+First, we need to count how many beer awards per region.
+
+```{r}
+# start with beer awards data, filter out DC
+# count awards (rows) per region
+beer_awards %>%
+  filter(region != "District of Columbia") %>%
+  count(region) %>%
+  arrange(-n) %>%
+  kable(col.names = c("Region in the US", "Total Number of Awards"),
+        caption = "Total number of awards per region (1987-2020)")
+```
+
+We might need to consider the different number of states per regions.
+
+```{r message=FALSE}
+# start with beer awards data, filter out DC
+# count awards per state and region
+beer_awards %>%
+  filter(region != "District of Columbia") %>%
+  count(state, region) %>%
+  group_by(region) %>%
+  summarise(average_awards = mean(n)) %>%
+  arrange(-average_awards) %>%
+  kable(col.names = c("Region in the US", "Average Number of Awards"),
+        digits = 2)
+
+```
+
+Going back to our data question (_Which region in the US has received the most beer awards?_), I would say that it is the West.
+
+## Analysis of Beer Types
+
+```{r}
+beer_awards %>%
+  count(region, macro_category) %>%
+  ggplot(aes(x = n,
+             y = macro_category,
+             fill = region)) +
+  geom_col()
+```
