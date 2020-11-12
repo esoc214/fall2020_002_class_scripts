@@ -47,7 +47,8 @@ head(beer_awards) %>%
 My data questions are as follows:
 
 1. Which region in the US has received the most beer awards?
-1. Which beer type has won the awards across different regions in the US?
+1. Which beer type has won the most awards across different regions in the US?
+1. Which beet type has won the most awards across different years?
 
 ## Awards per Region
 
@@ -84,11 +85,52 @@ Going back to our data question (_Which region in the US has received the most b
 
 ## Analysis of Beer Types
 
-```{r}
+Here's a dictionary of beer types. Macro categories (also referred to as beer type) was defined by the words used in the variable category. See Table 1 for a reference of what categories are included into each beer type.
+
+| Macro-Category | Explanation |
+| -------------- | ----------- |
+| Aged | Aged beers such as Fruited Wood- and Barrel-Aged Sour Beer |
+| Ale  | Ales such as American-Style Cream Ale |
+
+
+```{r echo=FALSE, fig.dim=c(7, 5)}
+library(tidytext)
+
 beer_awards %>%
-  count(region, macro_category) %>%
+  filter(region != "District of Columbia") %>%
+  count(macro_category, region) %>%
   ggplot(aes(x = n,
-             y = macro_category,
+             y = reorder_within(macro_category, n, region),
              fill = region)) +
-  geom_col()
+  geom_col() +
+  geom_label(aes(label = n), size = 1) +
+  facet_wrap(~region, scales = "free_y") +
+  scale_y_reordered() +
+  labs(x = "Total Number of Awards",
+       y = "",
+       caption = "Data from the Great American Beer Festival") +
+  theme_bw() +
+  theme(legend.position = "none")
 ```
+
+```{r}
+# get 5 types with the most awards
+beer_awards %>%
+  filter(macro_category != "other") %>%
+  count(macro_category) %>%
+  arrange(-n)
+
+# count macro_category and year
+# draw line plot with x mapped to year, y to n, color to macro_category
+beer_awards %>%
+  filter(macro_category %in% c("lager", "stout", "flavored", "pilsener", "porter")) %>%
+  count(macro_category, year) %>%
+  ggplot(aes(x = year,
+             y = n,
+             color = macro_category)) +
+  geom_line(aes(linetype = macro_category))
+```
+
+
+
+
