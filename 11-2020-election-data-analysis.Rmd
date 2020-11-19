@@ -1,0 +1,72 @@
+---
+title: "Presidential Elections 2020"
+author: "Adriana Picoral"
+date: "11/19/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(knitr)
+library(usmap)
+```
+
+# Presidential Elections -- 2020
+
+## Votes per State
+
+The map below shows each state in the United States colored according to the presidential that won that state (i.e., that got the most popular votes in that state). 
+
+```{r message=FALSE}
+# read data in
+elections2020 <- read_csv("data/presidential_elections_per_state.csv")
+
+# plot candidate on a map
+elections2020 %>%
+  plot_usmap(data = .,
+             values = "candidate") +
+  theme(legend.position = "right") +
+  scale_fill_manual(name = "",
+                    values = c("red3", "royalblue3")) +
+  ggtitle("States by Candidate with the Most Popular Votes")
+```
+
+```{r message=FALSE, fig.dim=c(7,2)}
+# draw a bar plot with number of electoral votes per candidate
+elections2020 %>%
+  group_by(candidate) %>%
+  summarise(total_electoral_votes = sum(electoral_votes)) %>%
+  ggplot(aes(x = total_electoral_votes,
+             y = candidate,
+             fill = candidate)) +
+  geom_col() +
+  geom_label(aes(label = total_electoral_votes)) +
+  scale_fill_manual(values = c("red3", "royalblue3")) +
+  theme_minimal() +
+  theme(legend.position = "none",
+        axis.text.x = element_blank()) +
+  labs(y = "", x = "Total Electoral Votes")
+```
+
+# Popular Votes
+
+```{r message=FALSE}
+# read data in
+popular_votes_data <- read_csv("data/election_data_2020.csv")
+
+# plot the recoded candidate variable
+popular_votes_data %>%
+  group_by(candidate_2) %>%
+  summarise(popular_votes = sum(total_votes)) %>%
+  ggplot(aes(x = popular_votes,
+             y = reorder(candidate_2, popular_votes))) +
+  geom_segment(aes(xend = 0, yend = candidate_2)) +
+  geom_label(aes(label = popular_votes)) +
+  theme_minimal() +
+  labs(y = "",
+       x = "Total Popular Votes") +
+  theme(panel.grid.major = element_blank(),
+        axis.text.x = element_blank())
+```
+
