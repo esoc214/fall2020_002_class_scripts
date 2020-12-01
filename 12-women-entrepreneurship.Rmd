@@ -1,0 +1,70 @@
+---
+title: "Women Entrepreneurship by Country"
+author: "Adriana Picoral"
+date: "12/1/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# load libraries
+library(janitor)
+library(knitr)
+library(tidyverse)
+knitr::opts_chunk$set(echo = FALSE)
+
+# read data in
+women_entrepreneur_data <- read_delim("data/women_in_labor_force.csv",
+                                      delim = ";") %>%
+  clean_names()
+```
+
+# Introduction
+
+In this paper, I will discuss the effect of having women entrepreneurs on a country's economy. 
+
+# Methods
+
+My research question is as follows:
+
+1. What is the relationship of having more entrepreneurs in a country (no matter the gender) and that country's economy?
+1. What is the relationship of having more women entrepreneurs in a country and that country's economy?
+1. Do women entrepreneurs have a greater impact in the economy than just entrepreneurs in general?
+
+## Data
+
+The data I am using was obtained from [Kaggle](https://www.kaggle.com/babyoda/women-entrepreneurship-and-labor-force) and contains the following variables: `r colnames(women_entrepreneur_data)`. The data was collected in 2015 for `r nrow(women_entrepreneur_data)` countries.
+
+# Analysis
+
+The two variables we have available on economic development for each country: a binary variable called *level_of_development* (i.e., Developed vs. Developing) and *inflation_rate*. The first step in the analysis is to establish whether inflation rate is lower or higher for developed countries, assuming that developed countries have better economies. 
+
+The box plot below shows that *developed* countries have a lower inflation rate than *developing* countries. Thus, we will assume that the lower the inflation rate, the stronger the country's economy. 
+
+```{r}
+# draw bloxplot of level_of_development by inflation_rate
+women_entrepreneur_data %>%
+  ggplot(aes(x = level_of_development,
+             y = inflation_rate)) +
+  geom_boxplot() +
+  theme_linedraw() +
+  labs(x = "Level of Development",
+       y = "Inflation Rate",
+       title = "Inflation by Development across differente countries")
+
+```
+
+To answer my first research question (i.e., *What is the relationship of having more entrepreneurs in a country (no matter the gender) and that country's economy?*), we need to establish the relationship between inflation and entrepreneurship index. 
+
+
+```{r}
+# draw scatter plot of inflation_rate vs. entrepreneurship index
+women_entrepreneur_data %>%
+  ggplot(aes(x = entrepreneurship_index,
+             y = inflation_rate)) +
+  geom_point() +
+  geom_smooth(method = "lm",
+              formula = y ~ x)
+
+```
+
+
