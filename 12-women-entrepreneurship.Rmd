@@ -49,11 +49,13 @@ women_entrepreneur_data %>%
   theme_linedraw() +
   labs(x = "Level of Development",
        y = "Inflation Rate",
-       title = "Inflation by Development across differente countries")
+       title = "Inflation by Development across different countries")
 
 ```
 
 To answer my first research question (i.e., *What is the relationship of having more entrepreneurs in a country (no matter the gender) and that country's economy?*), we need to establish the relationship between inflation and entrepreneurship index. 
+
+The scatter plot below shows that inflation rate has a negative relationship with entrepreneurship index. As entrepreneurship increases, inflation rate decreases. We can infer that having a high index for entrepreneurship (i.e., a lot of people owning business) is good for a country's economy.
 
 
 ```{r}
@@ -63,8 +65,60 @@ women_entrepreneur_data %>%
              y = inflation_rate)) +
   geom_point() +
   geom_smooth(method = "lm",
-              formula = y ~ x)
+              formula = y ~ x) +
+  theme_linedraw() +
+  labs(x = "Entrepreneurship Index",
+       y = "Inflation Rate",
+       title = "Inflation Rate by Entrepreneurship Index")
 
 ```
 
 
+```{r}
+# run linear regression
+model_one <- women_entrepreneur_data %>%
+  lm(formula = inflation_rate ~ entrepreneurship_index) %>%
+  summary()
+```
+
+The table below shows the results of the linear regression (i.e., inflation rate by entrepreneurship index). As shown in both the plot above and the table below, the relationship between inflation and entrepreneurship is negative, with inflation going down by `r round(model_one$coefficients[2, 1], digits = 2)` point for each additional point in Entrepreneurship. The linear regression model for this relationship explains `r round(model_one$adj.r.squared, digits = 2)*100`% of the variation in the data.
+
+```{r}
+# print out coefficients of regression results
+model_one$coefficients %>%
+  kable()
+```
+
+
+To answer my second research question (i.e., *What is the relationship of having more women entrepreneurs in a country and that country's economy?*), we need to establish the relationship between inflation and women entrepreneurship index. 
+
+```{r}
+women_entrepreneur_data %>%
+  ggplot(aes(x = women_entrepreneurship_index,
+             y = inflation_rate)) +
+  geom_point() +
+  geom_smooth(method = "lm",
+              formula = y ~ x) +
+  theme_linedraw() +
+  labs(x = "Women Entrepreneurship Index",
+       y = "Inflation Rate",
+       title = "Inflation by Women Entrepreneurship")
+```
+
+
+```{r}
+model_two <- women_entrepreneur_data %>%
+  lm(formula = inflation_rate ~ women_entrepreneurship_index) %>%
+  summary()
+```
+
+The table below shows that the relationship between inflation and women entrepreneurship is negative. Inflation goes down by `r round(model_two$coefficients[2,1], digits = 2)` for every point increase in women entrepreneurship index. The model explains `r round(model_two$adj.r.squared, digits = 2)*100`% of the variance.
+
+
+```{r}
+model_two$coefficients %>%
+  kable()
+```
+
+
+Finally, to answer my third question (i.e., *Do women entrepreneurs have a greater impact in the economy than just entrepreneurs in general?*). Since the estimate for the impact on inflation rate by women entrepreneurship is higher than just entrepreneurship, and the variance explained is also higher, we can say that women entrepreneurs have a greater impact in the economy than just entrepreneurs in general.
